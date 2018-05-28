@@ -82,7 +82,7 @@ router.put('/addView/:pointName', function (req, res) {
     }).catch(function (err) { res.status(400).send(err); });
 });
 
-//addRate request
+//addRate request-----------------------------------------------------------------------------------------
 router.post('/addRate', function (req,res) {
     var pointName = req.body.pointName;
     var rate = req.body.rate;
@@ -110,7 +110,7 @@ router.post('/addReview', function (req,res) {
     DButilsAzure.execQuery("UPDATE PointsOfInterest SET lastReviewOne='" + oldRev2 + "' AND lastReviewTwo='" + review + "' WHERE pointName = '" + pointName + "'" );
 });
 
-//getAllCategories request
+//getAllCategories request--works
 router.get('/categories', function (req, res) {
     DButilsAzure.execQuery("SELECT * from Categories").then(function (result) {
         res.send(result);
