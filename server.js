@@ -4,7 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var cors = require('cors');
-var jwk=require('jsonwebtoken');
+var jwt=require('jsonwebtoken');
 app.use(cors());
 var DButilsAzure = require('./DButils');
 var Users = require('./server_modules/Users'); // get our users model
@@ -25,13 +25,25 @@ app.post('/Users/login', function (req, res) {
     .then(function (result) {
         if (result.length > 0) {
             //return Token
-            res.send(true);
+            var payload={
+                userName:nameUser,
+                password:password
+            }
+
+            var token=jwt.sign(payload,'secret',{expiresIn:"2d"});
+
+            res.json({
+                success:true,
+                message:'login succeed',
+                token:token
+            });
+
         } else {
-            res.send(false);
+            res.send("connection failed");
         }
     }).catch(function (err) { res.status(400).send(err); });
 
-    res.send("done");
+    //res.send("done");
 
 })
 
