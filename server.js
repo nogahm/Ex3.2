@@ -13,14 +13,16 @@ app.use(bodyParser.json());
 
 //complete your code here
 
+//users module
 //login post request
-app.post('/login', function (req, res) {
+app.post('/Users/login', function (req, res) {
     var nameUser = req.body.userName;
     var password = req.body.password;
-    DButilsAzure.execQuery("Select * from Users Where userName='" + nameUser + "' AND password='" + password + "'  ").then(function (result) {
+    DButilsAzure.execQuery("Select * from Users Where userName='" + nameUser + "' AND password='" + password + "'  ")
+    .then(function (result) {
         if (result.length > 0) {
+            //return Token
             res.send(true);
-
         } else {
             res.send(false);
         }
@@ -31,17 +33,17 @@ app.post('/login', function (req, res) {
 })
 
 //register post request
-app.post('/register', function (req, res) {
-    var username = req.body[0].userName;
-    var password = req.body[0].password;
-    var firstName = req.body[0].firstName;
-    var lastName = req.body[0].lastName;
-    var city = req.body[0].city;
-    var country = req.body[0].country;
-    var email = req.body[0].email;
-    var passwordRecoveryAnswer = req.body[0].passwordRecoveryAnswer;
+app.post('/Users/register', function (req, res) {
+    var username = req.body.userName;
+    var password = req.body.password;
+    var firstName = req.body.firstName;
+    var lastName = req.body.lastName;
+    var city = req.body.city;
+    var country = req.body.country;
+    var email = req.body.email;
+    var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
 
-    DButilsAzure.execQuery("INSERT INTO [Users] ( [userName], [password],[firstName],[lastName],[city],[country],[email],[passwordRecoveryAnswer]) VALUES (username,password,firstName,lastName,city,country,email,passwordRecoveryAnswer)").then(function (result) {
+    DButilsAzure.execQuery("INSERT INTO [Users] ([userName], [password],[firstName],[lastName],[city],[country],[email],[passwordRecoveryAnswer]) VALUES (username,password,firstName,lastName,city,country,email,passwordRecoveryAnswer)").then(function (result) {
         res.send(result)
     }).catch(function (err) {
         console.log(err)
@@ -51,7 +53,7 @@ app.post('/register', function (req, res) {
 });
 
 //password recovery request
-app.post('/passwordRecovery', function (req, res, next) {
+app.post('/Users/passwordRecovery', function (req, res, next) {
     var name = req.body.userName;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
     DButilsAzure.execQuery("Select [password] from Users Where userName = '" + name + "' AND passwordRecoveryAnswer = '" + passwordRecoveryAnswer + "'")
@@ -59,15 +61,16 @@ app.post('/passwordRecovery', function (req, res, next) {
             if (result[0] == string.empty())
                 res.status(400).send();
             else
-                res.send(result[0]);
+                res.send(result[0].password);
         }).catch(function (err) { res.status(400).send(err); });
 });
 
+//Points module
 //new explore request
-app.get('/newExplore/:minRate', function (req, res) {
+app.get('/Points/newExplore/:minRate', function (req, res) {
     var minRate = req.params.minRate;
     DButilsAzure.execQuery("SELECT * FROM PointsOfInterest Where rate >=" + minRate).then(function (result) {
-       /* if (result[0] == string.empty())
+        if (result[0] == string.empty())
             res.status(400).send();
         else {
             var size = result.size;
@@ -75,27 +78,27 @@ app.get('/newExplore/:minRate', function (req, res) {
             {
                 res.send(result);
             }
-            var rand1 = Math.floor((Math.random() * size) + 1) + 1;
-            var rand2 = Math.floor((Math.random() * size) + 1) + 1;
+            var rand1 = Math.floor((Math.random() * size));
+            var rand2 = Math.floor((Math.random() * size));
             while (rand2 == rand1) {
-                var rand2 = Math.floor((Math.random() * size) + 1) + 1;
+                var rand2 = Math.floor((Math.random() * size));
             }
-            var rand3 = Math.floor((Math.random() * size) + 1) + 1;
+            var rand3 = Math.floor((Math.random() * size));
             while (rand3 == rand1 || rand3 == rand2) {
-                var rand3 = Math.floor((Math.random() * size) + 1) + 1;
+                var rand3 = Math.floor((Math.random() * size));
             }
             var ans = {};
             ans[0] = result[rand1];
             ans[1] = result[rand2];
             ans[2] = result[rand3];
             res.send(ans);
-        }*/
+        }
         res.send(result);
     }).catch(function (err) { res.status(400).send(err); });
 });
 
 //costumPopularPoints request
-app.get('/costumPopularPoints/:userName', function (req, res) {
+app.get('/Points/costumPopularPoints/:userName', function (req, res) {
     var userName=req.params.userName;
     DButilsAzure.execQuery("Select TOP 2 pointName, picture, viewCount, description,PointsOfInterest.category,rate,lastReviewOne,lastReviewTwo From CategoryUsers INNER JOIN PointsOfInterest ON CategoryUsers.category = PointsOfInterest.category WHERE CategoryUsers.userName = '" + userName + "'" )
     .then(function (result) {
@@ -105,14 +108,15 @@ app.get('/costumPopularPoints/:userName', function (req, res) {
 
 
 //getAllPoints request
-app.get('/getAllPoints', function (req, res) {
-    DButilsAzure.execQuery("Select * from PointsOfInterest").then(function (result) {
+app.get('/Points/getAllPoints', function (req, res) {
+    DButilsAzure.execQuery("Select * from PointsOfInterest")
+    .then(function (result) {
         res.send(result);
     }).catch(function (err) { res.status(400).send(err); });
 });
 
 //filterByCategory request
-app.get('/filterByCategory/:category', function (req, res) {
+app.get('/Points/filterByCategory/:category', function (req, res) {
     var category = req.params.category;
     DButilsAzure.execQuery("Select * from PointsOfInterest Where category = '" + category + "'").then(function (result) {
         res.send(result);
@@ -120,7 +124,7 @@ app.get('/filterByCategory/:category', function (req, res) {
 });
 
 //showPoint request
-app.get('/showPoint/:pointName', function (req, res) {
+app.get('/Points/showPoint/:pointName', function (req, res) {
     var pointName = req.params.pointName;
     DButilsAzure.execQuery("Select * from PointsOfInterest Where pointName = '" + pointName + "'").then(function (result) {
         res.send(result);
@@ -129,7 +133,7 @@ app.get('/showPoint/:pointName', function (req, res) {
 
 
 //addView
-app.put('/addView', function (req, res) {
+app.put('/Points/addView', function (req, res) {
     var pointName = req.body.pointName;
     DButilsAzure.execQuery("Select [viewCount] from PointsOfInterest Where pointName = '" + pointName + "'").then(function (result) 
     {
@@ -139,9 +143,9 @@ app.put('/addView', function (req, res) {
 
 });
 
-
+//Favorites
 //removePointFromFavorite request
-app.delete('/removePointFromFavorite', function (req,res) {
+app.delete('/Favorites/removePointFromFavorite', function (req,res) {
     var pointName = req.body.pointName;
     var userName=req.body.userName;
     DButilsAzure.execQuery("DELETE from [UserFavorites] WHERE [pointOfInterest] = '" + pointName + " ' AND [userName] = '" + userName+ "'").then(function (result) {
@@ -150,7 +154,7 @@ app.delete('/removePointFromFavorite', function (req,res) {
 });
 
 //showFavoritePoint request
-app.get('/favorites/:userName', function (req,res) {
+app.get('/Favorites/:userName', function (req,res) {
     var userName = req.params.userName;
     console.log(userName);
     DButilsAzure.execQuery("Select pointName, picture, viewCount, description,PointsOfInterest.category,rate,lastReviewOne,lastReviewTwo From UserFavorites INNER JOIN PointsOfInterest ON UserFavorites.pointOfInterest = PointsOfInterest.pointName AND UserFavorites.userName = '" + userName+ "'")
@@ -161,7 +165,7 @@ app.get('/favorites/:userName', function (req,res) {
 });
 
 //manualSortFavorites request
-app.get('/manualSortFavorites', function (req,res) {
+app.get('/Favorites/manualSortFavorites', function (req,res) {
     var userName = req.params.userName;
     var pointsName = req.params.pointsName;
     for(var i=0;i<pointsName.size;i++)
@@ -171,7 +175,7 @@ app.get('/manualSortFavorites', function (req,res) {
 });
 
 //saveFavoriteInServer request
-app.post('/saveFavoriteInServer', function (req, res, next) {
+app.post('/Favorites/saveFavoriteInServer', function (req, res, next) {
     var name = req.body.userName;
     var points = req.body.pointsInterest;
     var maxNumberTime;
