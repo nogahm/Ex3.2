@@ -34,18 +34,18 @@ router.post('/login', function (req, res) {
     var password = req.body.password;
     DButilsAzure.execQuery("Select * from Users Where userName='" + nameUser + "' AND password='" + password + "'  ")
     .then(function (result) {
-        if (result[0].length > 0) {
+        if (result.length > 0) {
             //return Token
             var payload={
                 userName:nameUser,
                 password:password
             }
 
-            var token=jwt.sign(payload,'secret',{expiresIn:"2d"});
+            var token=jwt.sign(payload,secret,{expiresIn:"2d"});
 
             res.json({
                 success:true,
-                message:'login succeed',
+                message:'enjoy your token!',
                 token:token
             });
 
