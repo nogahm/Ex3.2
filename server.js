@@ -57,8 +57,7 @@ app.post('/Users/register', function (req, res) {
     var email = req.body.email;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
 
-    
-DButilsAzure.execQuery("INSERT INTO Users (userName,password,firstName,lastName,city,country,email,passwordRecoveryAnswer) VALUES ('"+req.body.userName+"', '"+req.body.password+"','"+req.body.firstName+"', '"+req.body.lastName+"', '"+req.body.city+"', '"+req.body.country+"','"+req.body.email+"', '"+req.body.passwordRecoveryAnswer+"')").then(function (result) {
+    DButilsAzure.execQuery("INSERT INTO Users (userName, password,firstName,lastName,city,country,email,passwordRecoveryAnswer) VALUES ('"+(username)+"','"+(password)+"','"+(firstName)+"','"+(lastName)+"','"+(city)+"','"+(country)+"','"+(email)+"','"+(passwordRecoveryAnswer)+"')").then(function (result) {
         res.send(result)
     }).catch(function (err) {
         console.log(err)
