@@ -108,7 +108,7 @@ app.get('/Points/costumPopularPoints/:userName', function (req, res) {
 
 
 //getAllPoints request
-app.get('/Points/getAllPoints', function (req, res) {
+app.get('/Points', function (req, res) {
     DButilsAzure.execQuery("Select * from PointsOfInterest")
     .then(function (result) {
         res.send(result);
