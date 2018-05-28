@@ -62,7 +62,7 @@ app.use('/register', function (req, res, next) {
 
 })
 
-app.use('/register/Points', poi);
+//app.use('/register/Points', poi);
 
 
 
