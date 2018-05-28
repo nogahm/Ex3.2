@@ -7,7 +7,7 @@ var DButilsAzure = require('../DButils');
 
 const secret="secret";
 
-//register post request
+//register post request--works
 router.post('/register', function (req, res) {
     var username = req.body.userName;
     var password = req.body.password;
@@ -18,7 +18,7 @@ router.post('/register', function (req, res) {
     var email = req.body.email;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
 
-    DButilsAzure.execQuery("insert into users values ('" + username+"', '"+ password+"', '"+firstName+ "', '"
+    DButilsAzure.execQuery("insert into Users values ('"+username+"', '"+ password+"', '"+firstName+ "', '"
     + lastName+"', '"+city+"', '"+country+"', '"+ email+"', '"+passwordRecoveryAnswer+"')" )
     .then(function (result) {
         res.send(result)
@@ -57,7 +57,7 @@ router.post('/login', function (req, res) {
     //res.send("done");
 })
 
-//password recovery request-----------------------------------------------------------------------------------------------------------------------------------------------------------
+//password recovery request--works
 router.post('/passwordRecovery', function (req, res) {
     var name = req.body.userName;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
@@ -77,17 +77,20 @@ router.post('/passwordRecovery', function (req, res) {
 })
 
 //Favorites
-//removePointFromFavorite request
+//removePointFromFavorite request--works
 router.delete('/removePointFromFavorite', function (req,res) {
     var pointName = req.body.pointName;
     var userName=req.body.userName;
-    DButilsAzure.execQuery("DELETE from UserFavorites WHERE pointOfInterest = '" + pointName + " ' AND userName = '" + userName+ "'")
+    console.log(userName);
+    console.log(pointName);
+    let sql = "DELETE from UserFavorites WHERE pointOfInterest = '"+pointName+"' AND userName = '" + userName+ "'";
+    DButilsAzure.execQuery(sql)
     .then(function (result) {
-        res.status(200).send(result);
+        res.send(result);
     }).catch(function(err){ res.status(400).send(err);});
 });
 
-//showFavoritePoint request
+//showFavoritePoint request-works
 router.get('/favorites/:userName', function (req,res) {
     var userName = req.params.userName;
     console.log(userName);
@@ -98,7 +101,7 @@ router.get('/favorites/:userName', function (req,res) {
         //to sort by order num
 });
 
-//manualSortFavorites request
+//manualSortFavorites request----------------------------------------------------------------------------------------------------------------------------------------------------------
 router.get('/favorites/manualSortFavorites', function (req,res) {
     var userName = req.params.userName;
     var pointsName = req.params.pointsName;
@@ -108,8 +111,8 @@ router.get('/favorites/manualSortFavorites', function (req,res) {
     }
 });
 
-//saveFavoriteInServer request
-router.post('/favorites/saveFavoriteInServer', function (req, res, next) {
+//saveFavoriteInServer request----------------------------------------------------------------------------------------------------------------------------------------------------------
+router.post('/favorites/saveFavoriteInServer', function (req, res) {
     var name = req.body.userName;
     var points = req.body.pointsInterest;
     var maxNumberTime;
@@ -120,47 +123,14 @@ router.post('/favorites/saveFavoriteInServer', function (req, res, next) {
     DButilsAzure.execQuery("Select Max(orderNumber) from UserFavorites Where userName = '" + name + "'").then(function (result) {
         maxOrderNum=result[0]+1; 
     }).catch(function (err) { res.status(400).send(err); });
-    for(var i=0;i<points.size;i++)
+    for(var i=0;i<points.length;i++)
     {
-        DButilsAzure.execQuery("INSERT INTO [UserFavorites] ( [userName], [pointOfInterest],[numberTime],[orderNumber]) VALUES (name,points[i],maxNumberTime,maxOrderNum)").then(function (result) {
+        DButilsAzure.execQuery("INSERT INTO UserFavorites VALUES ('"+name,points[i]+"','"+maxNumberTime+"','"+maxOrderNum+"')").then(function (result) {
             maxNumberTime++;  
             maxOrderNum++;
     });
 }
-
 });
 
-//addRate request
-router.post('/addRate', function (req,res) {
-    var pointName = req.body.pointName;
-    var rate = req.body.rate;
-    var newRate;
-    var oldrate;
-    var numberOfRates;
-    DButilsAzure.execQuery("Select [rate][numberOfRates] from pointOfInterest Where pointName = '" + pointName + "'").then(function (result) {
-        oldrate=result[0].rate;
-        numberOfRates=result[0].numberOfRates;
-    }).catch(function (err) { res.status(400).send(err); });
-    newRate=((oldrate*numberOfRates)+rate)/(numberOfRates+1);
-    numberOfRates++;
-    DButilsAzure.execQuery("UPDATE PointsOfInterest SET rate='" + newRate + "' AND numberOfRates='" + numberOfRates + "' WHERE pointName = '" + pointName + "'" );
-});
 
-//addReview request
-router.post('/addReview', function (req,res) {
-    var pointName = req.body.pointName;
-    var review = req.body.review;
-    var oldRev2;
-    DButilsAzure.execQuery("Select lastReviewTwo from pointOfInterest Where pointName = '" + pointName + "'").then(function (result) {
-        oldRev2=result[0]; 
-    }).catch(function (err) { res.status(400).send(err); });
-    DButilsAzure.execQuery("UPDATE PointsOfInterest SET lastReviewOne='" + oldRev2 + "' AND lastReviewTwo='" + review + "' WHERE pointName = '" + pointName + "'" );
-});
-
-//getAllCategories request
-router.get('/categories', function (req, res) {
-    DButilsAzure.execQuery("SELECT * from Categories").then(function (result) {
-        res.send(result);
-    }).catch(function (err) { res.status(400).send(err); });
-});
 module.exports=router;

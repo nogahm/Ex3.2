@@ -7,7 +7,7 @@ var DButilsAzure = require('../DButils');
 
 const secret="secret";
 
-//new explore request
+//new explore request----------------------------------------------------------------------------------------------------------
 router.get('/Points/newExplore/:minRate', function (req, res) {
     var minRate = req.params.minRate;
     DButilsAzure.execQuery("SELECT * FROM PointsOfInterest Where rate >=" + minRate).then(function (result) {
@@ -82,4 +82,37 @@ router.put('/addView/:pointName', function (req, res) {
     }).catch(function (err) { res.status(400).send(err); });
 });
 
+//addRate request
+router.post('/addRate', function (req,res) {
+    var pointName = req.body.pointName;
+    var rate = req.body.rate;
+    var newRate;
+    var oldrate;
+    var numberOfRates;
+    DButilsAzure.execQuery("Select [rate][numberOfRates] from pointOfInterest Where pointName = '" + pointName + "'").then(function (result) {
+        oldrate=result[0].rate;
+        numberOfRates=result[0].numberOfRates;
+    }).catch(function (err) { res.status(400).send(err); });
+    newRate=((oldrate*numberOfRates)+rate)/(numberOfRates+1);
+    numberOfRates++;
+    DButilsAzure.execQuery("UPDATE PointsOfInterest SET rate='" + newRate + "' AND numberOfRates='" + numberOfRates + "' WHERE pointName = '" + pointName + "'" );
+});
+
+//addReview request
+router.post('/addReview', function (req,res) {
+    var pointName = req.body.pointName;
+    var review = req.body.review;
+    var oldRev2;
+    DButilsAzure.execQuery("Select lastReviewTwo from pointOfInterest Where pointName = '" + pointName + "'").then(function (result) {
+        oldRev2=result[0]; 
+    }).catch(function (err) { res.status(400).send(err); });
+    DButilsAzure.execQuery("UPDATE PointsOfInterest SET lastReviewOne='" + oldRev2 + "' AND lastReviewTwo='" + review + "' WHERE pointName = '" + pointName + "'" );
+});
+
+//getAllCategories request
+router.get('/categories', function (req, res) {
+    DButilsAzure.execQuery("SELECT * from Categories").then(function (result) {
+        res.send(result);
+    }).catch(function (err) { res.status(400).send(err); });
+});
 module.exports=router;
