@@ -71,3 +71,5 @@ router.post('/Users/passwordRecovery', function (req, res, next) {
                 res.send(result[0].password);
         }).catch(function (err) { res.status(400).send(err); });
 });
+
+module.exports=router;

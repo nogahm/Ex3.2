@@ -17,6 +17,7 @@ var superSecret= "secret";
 
 
 app.use('/Users', users);
+app.use('/Points', poi);
 
 
 var port = 3000;

@@ -169,3 +169,5 @@ router.get('/categories', function (req, res) {
         res.send(result);
     }).catch(function (err) { res.status(400).send(err); });
 });
+
+module.exports=router;
