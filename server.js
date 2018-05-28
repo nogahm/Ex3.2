@@ -57,13 +57,13 @@ app.post('/Users/register', function (req, res) {
     var email = req.body.email;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
 
-    DButilsAzure.execQuery("INSERT INTO [Users] ([userName], [password],[firstName],[lastName],[city],[country],[email],[passwordRecoveryAnswer]) VALUES (username,password,firstName,lastName,city,country,email,passwordRecoveryAnswer)").then(function (result) {
+    DButilsAzure.execQuery("INSERT INTO [Users] ([userName], [password],[firstName],[lastName],[city],[country],[email],[passwordRecoveryAnswer]) VALUES ('"+username+"','"+password+"','"+firstName+"','"+lastName+"','"+city+"','"+country+"','"+email+"','"+passwordRecoveryAnswer+"')").then(function (result) {
         res.send(result)
     }).catch(function (err) {
         console.log(err)
     })
 
-    //to return boolean feedback to user
+    //return boolean feedback to user
 });
 
 //password recovery request
