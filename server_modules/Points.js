@@ -7,14 +7,14 @@ var DButilsAzure = require('../DButils');
 
 const secret="secret";
 
-//new explore request----------------------------------------------------------------------------------------------------------
-router.get('/Points/newExplore/:minRate', function (req, res) {
+//new explore request--works
+router.get('/newExplore/:minRate', function (req, res) {
     var minRate = req.params.minRate;
     DButilsAzure.execQuery("SELECT * FROM PointsOfInterest Where rate >=" + minRate).then(function (result) {
-        if (result[0] == string.empty())
+        if (result.length==0)
             res.status(400).send();
         else {
-            var size = result.size;
+            var size = result.length;
             if(size<=3)
             {
                 res.send(result);
@@ -89,7 +89,8 @@ router.post('/addRate', function (req,res) {
     var newRate;
     var oldrate;
     var numberOfRates;
-    DButilsAzure.execQuery("Select [rate][numberOfRates] from pointOfInterest Where pointName = '" + pointName + "'").then(function (result) {
+    DButilsAzure.execQuery("Select rate, numberOfRates from pointOfInterest Where pointName = '" + pointName + "'")
+    .then(function (result) {
         oldrate=result[0].rate;
         numberOfRates=result[0].numberOfRates;
     }).catch(function (err) { res.status(400).send(err); });
