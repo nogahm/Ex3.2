@@ -7,8 +7,8 @@ var cors = require('cors');
 var jwt=require('jsonwebtoken');
 app.use(cors());
 var DButilsAzure = require('./DButils');
-var Users = require('./server_modules/Users'); // get our users model
-var poi = require('./server_modules/POI');
+//var Users = require('./server_modules/Users'); // get our users model
+//var poi = require('./server_modules/POI');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -23,7 +23,7 @@ app.post('/Users/login', function (req, res) {
     var password = req.body.password;
     DButilsAzure.execQuery("Select * from Users Where userName='" + nameUser + "' AND password='" + password + "'  ")
     .then(function (result) {
-        if (result.length > 0) {
+        if (result[0].length > 0) {
             //return Token
             var payload={
                 userName:nameUser,
@@ -44,7 +44,6 @@ app.post('/Users/login', function (req, res) {
     }).catch(function (err) { res.status(400).send(err); });
 
     //res.send("done");
-
 })
 
 //register post request
