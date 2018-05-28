@@ -28,7 +28,7 @@ router.post('/register', function (req, res) {
     //return boolean feedback to user
 });
 
-//login post request
+//login post request--works
 router.post('/login', function (req, res) {
     var nameUser = req.body.userName;
     var password = req.body.password;
@@ -57,26 +57,33 @@ router.post('/login', function (req, res) {
     //res.send("done");
 })
 
-//password recovery request
-router.post('/passwordRecovery', function (req, res, next) {
+//password recovery request-----------------------------------------------------------------------------------------------------------------------------------------------------------
+router.post('/passwordRecovery', function (req, res) {
     var name = req.body.userName;
     var passwordRecoveryAnswer = req.body.passwordRecoveryAnswer;
-    DButilsAzure.execQuery("Select [password] from Users Where userName = '" + name + "' AND passwordRecoveryAnswer = '" + passwordRecoveryAnswer + "'")
+    DButilsAzure.execQuery("Select password from Users Where userName = '" + name + "' AND passwordRecoveryAnswer = '" + passwordRecoveryAnswer + "' ")
         .then(function (result) {
-            if (result[0] == string.empty())
-                res.status(400).send();
+            if (result.length>0)
+            {
+                 //pass=result[0].password;
+                 res.send(result[0].password);
+            }
             else
-                res.send(result[0].password);
+            {
+                  res.status(400).send();
+            }
+                
         }).catch(function (err) { res.status(400).send(err); });
-});
+})
 
 //Favorites
 //removePointFromFavorite request
-router.delete('/favorites/removePointFromFavorite', function (req,res) {
+router.delete('/removePointFromFavorite', function (req,res) {
     var pointName = req.body.pointName;
     var userName=req.body.userName;
-    DButilsAzure.execQuery("DELETE from [UserFavorites] WHERE [pointOfInterest] = '" + pointName + " ' AND [userName] = '" + userName+ "'").then(function (result) {
-        res.status(200).send('Delete succeeded');
+    DButilsAzure.execQuery("DELETE from UserFavorites WHERE pointOfInterest = '" + pointName + " ' AND userName = '" + userName+ "'")
+    .then(function (result) {
+        res.status(200).send(result);
     }).catch(function(err){ res.status(400).send(err);});
 });
 
