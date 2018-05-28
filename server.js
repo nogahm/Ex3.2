@@ -4,8 +4,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var cors = require('cors');
+var jwk=require('jsonwebtoken');
 app.use(cors());
 var DButilsAzure = require('./DButils');
+var Users = require('./server_modules/Users'); // get our users model
+var poi = require('./server_modules/POI');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
