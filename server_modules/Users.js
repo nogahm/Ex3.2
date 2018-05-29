@@ -101,13 +101,18 @@ router.get('/favorites/:userName', function (req,res) {
         //to sort by order num
 });
 
-//manualSortFavorites request----------------------------------------------------------------------------------------------------------------------------------------------------------
-router.get('/favorites/manualSortFavorites', function (req,res) {
-    var userName = req.params.userName;
-    var pointsName = req.params.pointsName;
-    for(var i=0;i<pointsName.size;i++)
+//manualSortFavorites request--works
+router.post('/favorites/manualSortFavorites', function (req,res) {
+    var userName = req.body.userName;
+    var pointsName = req.body.pointsName;
+    for(var i=0;i<pointsName.length;i++)
     {
-        DButilsAzure.execQuery("UPDATE UserFavorites SET orderNumber='" + i + "' WHERE pointName = '" + pointsName[i] + "' AND userName = '" + userName + "'" );
+        let orderNumber=i+1;
+        DButilsAzure.execQuery("UPDATE UserFavorites SET orderNumber='" + orderNumber + "' WHERE pointOfInterest='" + pointsName[i] + "' AND userName = '" + userName + "'" ).then(function(result){
+            res.sendStatus(200);
+        }).catch(function(err){
+            res.send(err);
+        })
     }
 });
 
@@ -115,21 +120,29 @@ router.get('/favorites/manualSortFavorites', function (req,res) {
 router.post('/favorites/saveFavoriteInServer', function (req, res) {
     var name = req.body.userName;
     var points = req.body.pointsInterest;
-    var maxNumberTime;
-    var maxOrderNum;
-    DButilsAzure.execQuery("Select Max(numberTime) from UserFavorites Where userName = '" + name + "'").then(function (result) {
-        maxNumberTime=result[0]+1;
+    let maxNumberTime=1;
+    let maxOrderNum=1;
+    DButilsAzure.execQuery("Select Max(numberTime) from UserFavorites Where userName='" + name + "'").then(function (result1) {
+        if(result1.length==0)
+            maxNumberTime=1;
+        else
+            maxNumberTime=Number(result1[0])+1;
+        DButilsAzure.execQuery("Select Max(orderNumber) from UserFavorites Where userName='" + name + "'").then(function (result2) {
+            if(result1.length==0)
+                maxOrderNum=1;
+            else
+                maxOrderNum=Number(result2[0])+1;
+            for(var i=0;i<points.length;i++)
+            {
+                DButilsAzure.execQuery("INSERT INTO UserFavorites VALUES ('"+name+"', '"+points[i]+"', '"+maxNumberTime+"', '"+maxOrderNum+"')").then(function (result3) {
+                    maxNumberTime++;  
+                    maxOrderNum++;
+            });
+            } 
+        }).catch(function (err) { res.status(400).send(err); });
+        res.send(maxNumberTime);
     }).catch(function (err) { res.status(400).send(err); });
-    DButilsAzure.execQuery("Select Max(orderNumber) from UserFavorites Where userName = '" + name + "'").then(function (result) {
-        maxOrderNum=result[0]+1; 
-    }).catch(function (err) { res.status(400).send(err); });
-    for(var i=0;i<points.length;i++)
-    {
-        DButilsAzure.execQuery("INSERT INTO UserFavorites VALUES ('"+name,points[i]+"','"+maxNumberTime+"','"+maxOrderNum+"')").then(function (result) {
-            maxNumberTime++;  
-            maxOrderNum++;
-    });
-}
+
 });
 
 

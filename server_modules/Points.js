@@ -82,36 +82,41 @@ router.put('/addView/:pointName', function (req, res) {
     }).catch(function (err) { res.status(400).send(err); });
 });
 
-//addRate request-----------------------------------------------------------------------------------------
+//addRate request--works
 router.post('/addRate', function (req,res) {
     var pointName = req.body.pointName;
     var rate = req.body.rate;
-    var newRate;
-    var oldrate;
-    var numberOfRates;
     DButilsAzure.execQuery("Select rate, numberOfRates from PointsOfInterest Where pointName = '" + pointName + "'")
     .then(function (result) {
         if(result.length>0)
         {
-            oldrate=result[0].rate;
-            numberOfRates=result[0].numberOfRates;
-            newRate=((oldrate*numberOfRates)+rate)/(numberOfRates+1);
-            numberOfRates++;
-            DButilsAzure.execQuery("UPDATE PointsOfInterest SET rate='" + newRate + "' AND numberOfRates='" + numberOfRates + "' WHERE pointName = '" + pointName + "'" );
+            let oldrate=result[0].rate;
+            let numberOfRates=result[0].numberOfRates;
+            let newRate=((Number(oldrate)*numberOfRates)+Number(rate))/(numberOfRates+1);
+            numberOfRates=numberOfRates+1;
+            DButilsAzure.execQuery("UPDATE PointsOfInterest SET rate='" + newRate + "', numberOfRates='" + numberOfRates + "' WHERE pointName='" + pointName + "'" ).then(function(result){
+                res.sendStatus(200);
+            }).catch(function(err){
+                res.send(err);
+            })
         }
         
     }).catch(function (err) { res.status(400).send(err); });
    
 });
 
-//addReview request----------------------------------------------------------------------------------------
+//addReview request--works
 router.post('/addReview', function (req,res) {
     var pointName = req.body.pointName;
     var review = req.body.review;
     var oldRev2;
     DButilsAzure.execQuery("Select lastReviewTwo from PointsOfInterest Where pointName = '" + pointName + "'").then(function (result) {
         oldRev2=result[0].lastReviewTwo; 
-        DButilsAzure.execQuery("UPDATE PointsOfInterest SET lastReviewOne='" + oldRev2 + "' AND lastReviewTwo='" + review + "' WHERE pointName = '" + pointName + "'" );
+        DButilsAzure.execQuery("UPDATE PointsOfInterest SET lastReviewOne='" + oldRev2 + "', lastReviewTwo='" + review + "' WHERE pointName = '" + pointName + "'" ).then(function(result){
+            res.sendStatus(200);
+        }).catch(function(err){
+            res.send(err);
+        })
     }).catch(function (err) { res.status(400).send(err); });
 });
 
