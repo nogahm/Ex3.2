@@ -116,31 +116,39 @@ router.post('/favorites/manualSortFavorites', function (req,res) {
     }
 });
 
-//saveFavoriteInServer request----------------------------------------------------------------------------------------------------------------------------------------------------------
+//saveFavoriteInServer request--works
 router.post('/favorites/saveFavoriteInServer', function (req, res) {
     var name = req.body.userName;
     var points = req.body.pointsInterest;
     let maxNumberTime=1;
     let maxOrderNum=1;
-    DButilsAzure.execQuery("Select Max(numberTime) from UserFavorites Where userName='" + name + "'").then(function (result1) {
-        if(result1.length==0)
-            maxNumberTime=1;
+    DButilsAzure.execQuery("Select Max(numberTime) AS mnt from UserFavorites Where userName='" + name + "'").then(function (result1) {
+        if(result1.length>0)
+        {
+            maxNumberTime=result1[0].mnt+1;
+
+        }
         else
-            maxNumberTime=Number(result1[0])+1;
-        DButilsAzure.execQuery("Select Max(orderNumber) from UserFavorites Where userName='" + name + "'").then(function (result2) {
+        {
+            maxNumberTime=1;
+        }
+        DButilsAzure.execQuery("Select Max(orderNumber) AS mon from UserFavorites Where userName='" + name + "'").then(function (result2) {
             if(result1.length==0)
+            {
                 maxOrderNum=1;
+            }
             else
-                maxOrderNum=Number(result2[0])+1;
+                maxOrderNum=result2[0].mon+1;
             for(var i=0;i<points.length;i++)
             {
-                DButilsAzure.execQuery("INSERT INTO UserFavorites VALUES ('"+name+"', '"+points[i]+"', '"+maxNumberTime+"', '"+maxOrderNum+"')").then(function (result3) {
-                    maxNumberTime++;  
-                    maxOrderNum++;
+                DButilsAzure.execQuery("INSERT INTO UserFavorites VALUES ('"+name+"', '"+points[i].name+"', '"+maxNumberTime+"', '"+maxOrderNum+"')").then(function (result3) {
+
             });
+            maxNumberTime++;  
+            maxOrderNum++;
             } 
         }).catch(function (err) { res.status(400).send(err); });
-        res.send(maxNumberTime);
+        res.sendStatus(200);
     }).catch(function (err) { res.status(400).send(err); });
 
 });
