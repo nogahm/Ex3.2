@@ -5,6 +5,8 @@ var cors = require('cors');
 app.use(cors());
 var poi= require('./server_modules/Points');
 var users= require('./server_modules/Users');
+var fov= require('./server_modules/Favorites');
+
 var DButilsAzure = require('./DButils');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
@@ -18,7 +20,7 @@ var superSecret= "secret";
 
 app.use('/Users', users);
 app.use('/Points', poi);
-
+app.use('/reg/Favorites',fov );
 
 var port = 3000;
 app.listen(port, function () {
@@ -26,7 +28,7 @@ app.listen(port, function () {
 });
 // //-------------------------------------------------------------------------------------------------------------------
 // route middleware to verify a token
-app.use('/register', function (req, res, next) {
+app.use('/reg', function (req, res, next) {
 
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];

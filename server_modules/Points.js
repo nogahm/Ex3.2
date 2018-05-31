@@ -38,26 +38,6 @@ router.get('/newExplore/:minRate', function (req, res) {
     }).catch(function (err) { res.status(400).send(err); });
 });
 
-//costumPopularPoints request--workes
-router.get('/costumPopularPoints', function (req, res) {
-    var token=req.params.token || req.query.token || req.headers['x-access-token'];
-    var decoded = jwt.decode(token, {complete: true});
-    req.decoded= decoded;
-    var userName= decoded.payload.userName;
-    var ans=[];
-    DButilsAzure.execQuery("Select TOP 2 category from CategoryUsers where userName='"+userName+"'").then(function(result)
-    {
-        category1=result[0].category;
-        category2=result[1].category;
-        DButilsAzure.execQuery("Select * from PointsOfInterest where category='"+category1+"' order by rate desc").then(function(result2){
-            ans[0]=result2[0];
-            DButilsAzure.execQuery("Select * from PointsOfInterest where category='"+category2+"' order by rate desc").then(function(result3){
-                ans[1]=result3[0];
-                res.send(ans);
-            }).catch(function(err){ res.status(400).send(err);});
-        }).catch(function(err){ res.status(400).send(err);});
-    }).catch(function(err){ res.status(400).send(err);});
-});
 
 //getAllPoints request--works
 router.get('/getAllPoints', function (req, res) {
